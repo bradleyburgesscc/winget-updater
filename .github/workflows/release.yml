@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Make vswhere available on PATH
+        # The NativeAOT linker step shells out to vswhere.exe to locate the MSVC
+        # toolchain (link.exe). It isn't on PATH by default even though it ships with
+        # the runner's Visual Studio install.
+        shell: pwsh
+        run: echo "C:\Program Files (x86)\Microsoft Visual Studio\Installer" >> $env:GITHUB_PATH
+
+      - name: Publish (NativeAOT, win-x64)
+        run: dotnet publish WingetUpdater.csproj -c Release -r win-x64 -o dist
+
+      - name: Run self-tests against the published binary
+        run: .\dist\winget-updater.exe --selftest
+
+      - name: Package artifact
+        id: package
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}"
+          $zipName = "winget-updater-$version-win-x64.zip"
+          Compress-Archive -Path dist\winget-updater.exe -DestinationPath $zipName
+          echo "zip_name=$zipName" >> $env:GITHUB_OUTPUT
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ steps.package.outputs.zip_name }}
+            dist/winget-updater.exe
+          generate_release_notes: true
