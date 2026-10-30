@@ -33,7 +33,7 @@ winget-updater.exe [options]
 |---|---|
 | `--no-elevate` | Don't relaunch elevated; run with current privileges. |
 | `--include-pinned` | Also list packages that have a non-blocking pin. |
-| `--no-include-unknown` | Don't list packages whose installed version winget can't determine (on by default). |
+| `--include-unknown` | Also list packages whose installed version winget can't determine. |
 | `--selftest` | Run the internal parser self-tests and exit — no winget or admin needed. |
 | `-h`, `--help` | Show usage. |
 

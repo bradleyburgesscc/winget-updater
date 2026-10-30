@@ -29,7 +29,7 @@ public static class Program
         bool noElevate = args.Contains("--no-elevate");
         bool relaunched = args.Contains("--relaunched");
         bool includePinned = args.Contains("--include-pinned");
-        bool includeUnknown = !args.Contains("--no-include-unknown");
+        bool includeUnknown = args.Contains("--include-unknown");
 
         if (!noElevate && !IsElevated())
         {
@@ -199,8 +199,7 @@ public static class Program
 
               --no-elevate           Don't relaunch elevated; run with current privileges.
               --include-pinned       Also list packages that have a non-blocking pin.
-              --no-include-unknown   Don't list packages whose installed version is unknown
-                                      (that inclusion is on by default).
+              --include-unknown      Also list packages whose installed version is unknown.
               --selftest             Run internal parser self-tests and exit.
               -h, --help             Show this help.
 
